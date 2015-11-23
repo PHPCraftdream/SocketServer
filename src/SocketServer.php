@@ -79,7 +79,7 @@
 		{
 			$th = $this->proxyThis();
 
-			throw new Exception($th->getLastSocketError());
+			throw new \Exception($th->getLastSocketError());
 		}
 
 		public function closeSocket($conRes)
@@ -185,7 +185,7 @@
 				$th->pid = posix_getpid();
 
 			if (file_exists($th->pidFile))
-				throw new Exception("Process already exists: " . @abs(@file_get_contents($th->pidFile)));
+				throw new \Exception("Process already exists: " . @abs(@file_get_contents($th->pidFile)));
 
 			$this->pcntlFork();
 
