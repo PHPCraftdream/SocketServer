@@ -144,13 +144,29 @@
 			$th->closeConnectionsByIds($deadIds);
 		}
 
+		public function getNewConnection()
+		{
+			$conn = NULL;
+
+			try
+			{
+				$conn = @socket_accept($socket)
+			}
+			catch (\PHPCraftdream\ErrorLog\UnhandledError $e)
+			{
+				$conn = NULL;
+			}
+
+			return $conn;
+		}
+
 		public function acceptNewConnections()
 		{
 			$th = $this->proxyThis();
 
 			$newConnections = [];
 
-			while ($connection = @socket_accept($th->socket))
+			while ($connection = $th->getNewConnection($th->socket))
 			{
 				socket_set_nonblock($connection);
 
