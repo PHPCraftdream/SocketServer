@@ -177,42 +177,6 @@
 			}
 		}
 
-		public function pidFileIsOld()
-		{
-			$th = $this->proxyThis();
-			$th->getPidFileModTime();
-
-			if (!is_file($th->pidFile))
-				return false;
-
-			$lastSeconds = abs(time() - $th->pidFileModTime);
-			$criticalSeconds = 2 * __CLASS__::PID_FILE_CHECK_INTERVAL_SEC;
-
-			$res= $lastSeconds >= $criticalSeconds;
-
-			return $res;
-		}
-
-		public function getPidFileModTime()
-		{
-			$th = $this->proxyThis();
-
-			$th->pidFileModTime = $th->filemtime__($th->pidFile);
-
-			return $th->pidFileModTime;
-		}
-
-		public function updatePidFile()
-		{
-			$th = $this->proxyThis();
-
-			if (empty($th->pidFileModTime))
-				$th->pidFileModTime = $th->getPidFileModTime();
-
-			if (abs(time() - $th->pidFileModTime) >= __CLASS__::PID_FILE_CHECK_INTERVAL_SEC)
-				file_put_contents($th->pidFile, $th->pid);
-		}
-
 		public function listen()
 		{
 			$th = $this->proxyThis();
