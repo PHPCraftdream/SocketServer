@@ -49,33 +49,33 @@
 
 			$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 			if (!$socket)
-				return $th->throwLastCoecketError();
+				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
 
 			$nb = $th->socket_set_nonblock__($socket);
 			if ($nb === false)
-				return $th->throwLastCoecketError();
+				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
 
 			$SO_REUSEADDR = $th->socket_set_option__($socket, SOL_SOCKET, SO_REUSEADDR, 1);
 			if ($SO_REUSEADDR === false)
-				return $th->throwLastCoecketError();
+				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
 
 			$bind = $th->socket_bind__($socket, $th->addr, $th->port);
 			if ($bind === false)
-				return $th->throwLastCoecketError();
+				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
 
 			$listen = $th->socket_listen__($socket);
 			if ($listen === false)
-				return $th->throwLastCoecketError();
+				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
 
 			$th->socket = $socket;
 		}
 
-		public function throwLastCoecketError()
+		public function throwLastSocketError()
 		{
 			$th = $this->proxyThis();
 
