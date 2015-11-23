@@ -150,7 +150,7 @@
 
 			try
 			{
-				$conn = @socket_accept($socket)
+				$conn = @socket_accept($socket);
 			}
 			catch (\PHPCraftdream\ErrorLog\UnhandledError $e)
 			{
