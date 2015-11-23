@@ -1,0 +1,26 @@
+{
+	"name": "phpcraftdream/socketserver",
+	"license": "MIT",
+	"autoload":
+	{
+		"psr-4":
+		{
+			"PHPCraftdream\\SocketServer\\": "src/"
+		}
+	},
+	"authors":
+	[
+		{
+			"name": "PHP Craft Dream"
+		}
+	],
+	"require":
+	{
+		"phpunit/phpunit": "4.*",
+		"phpcraftdream/coreobject": "dev-master",
+		"phpcraftdream/events": "dev-master",
+		"phpcraftdream/calllog": "dev-master",
+		"phpcraftdream/totaltest": "dev-master",
+		"phpcraftdream/errorlog": "dev-master"
+	}
+}
