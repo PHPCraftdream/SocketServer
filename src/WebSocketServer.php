@@ -3,10 +3,10 @@
 
 	class WebSocketServer extends \PHPCraftdream\SocketServer\SocketServer
 	{
-		public function initServ($addr, $port, $pidFile)
+		public function initServ($addr, $port)
 		{
 			$th = $this->proxyThis();
-			$th->___parentCall('initServ', [$addr, $port, $pidFile]);
+			$th->___parentCall('initServ', [$addr, $port]);
 			$th->makeTriggers();
 		}
 
