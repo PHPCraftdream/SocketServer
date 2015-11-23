@@ -78,7 +78,7 @@
 
 			$last = abs(time() - $th->lastCollectCyclesTime);
 
-			if ($last < __CLASS__::CYCLES_CHECK_INTERVAL_SEC)
+			if ($last < self::CYCLES_CHECK_INTERVAL_SEC)
 				return;
 
 			gc_collect_cycles();
