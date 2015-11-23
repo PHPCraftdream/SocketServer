@@ -39,14 +39,18 @@
 			$th = $this->proxyThis();
 
 			if (strtolower($con->mess) === 'ping')
-				return $con->mess = NULL;
+			{
+				$th->___parentCall('sendMessage', [$con->resource, 'PONG']);
+				return;
+			}
 
 			$con->mess = $th->dataDecode($con->mess);
 
 			if (strtolower($con->mess) === 'ping')
-				return $con->mess = NULL;
-
-			$th->wsMessage($con->resource, $con->mess);
+			{
+				$th->wsMessage($con->resource, 'PONG');
+				return;
+			}
 		}
 
 		public function wsMessage($socket, $mess)

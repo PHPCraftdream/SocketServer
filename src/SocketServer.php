@@ -8,21 +8,12 @@
 		public $addr;
 		public $port;
 		public $socket;
-		public $stop = false;
-
-		public $pid;
-		public $pidFile;
 
 		public $connections = array();
 
-		public function stop()
+		function __construct($addr = '127.0.0.1', $port = 35471)
 		{
-			$this->stop = true;
-		}
-
-		function __construct($addr = '127.0.0.1', $port = 35487, $pidFile)
-		{
-			$this->initServ($addr, $port, $pidFile);
+			$this->initServ($addr, $port);
 		}
 
 		public function getLastSocketError()
@@ -35,7 +26,7 @@
 			return $error;
 		}
 
-		public function initServ($addr, $port, $pidFile)
+		public function initServ($addr, $port)
 		{
 			$th = $this->proxyThis();
 
@@ -43,7 +34,6 @@
 
 			$th->addr = $addr;
 			$th->port = $port;
-			$th->pidFile = $pidFile;
 
 			//---------------------------------------------------------------
 
@@ -144,7 +134,7 @@
 			$th->closeConnectionsByIds($deadIds);
 		}
 
-		public function getNewConnection()
+		public function getNewConnection($socket)
 		{
 			$conn = NULL;
 
@@ -154,7 +144,7 @@
 			}
 			catch (\PHPCraftdream\ErrorLog\UnhandledError $e)
 			{
-				$conn = NULL;
+				return $th->throwLastSocketError();
 			}
 
 			return $conn;
@@ -187,74 +177,51 @@
 			}
 		}
 
-		public function initDaemon()
+		public function pidFileIsOld()
 		{
 			$th = $this->proxyThis();
+			$th->getPidFileModTime();
 
-			if (function_exists('pcntl_signal_dispatch'))
-				pcntl_signal_dispatch();
+			if (!is_file($th->pidFile))
+				return false;
 
-			if (function_exists('pcntl_signal_dispatch'))
-				pcntl_signal(SIGCHLD, array($th, 'stopServer'));
+			$lastSeconds = abs(time() - $th->pidFileModTime);
+			$criticalSeconds = 2 * __CLASS__::PID_FILE_CHECK_INTERVAL_SEC;
 
-			if (function_exists('posix_getpid'))
-				$th->pid = posix_getpid();
+			$res= $lastSeconds >= $criticalSeconds;
 
-			if (file_exists($th->pidFile))
-				throw new \Exception("Process already exists: " . @abs(@file_get_contents($th->pidFile)));
-
-			$this->pcntlFork();
-
-			file_put_contents($this->pidFile, $this->pid);
+			return $res;
 		}
 
-		public function pcntlFork()
+		public function getPidFileModTime()
 		{
 			$th = $this->proxyThis();
 
-			if (!function_exists('pcntl_fork')) return;
+			$th->pidFileModTime = $th->filemtime__($th->pidFile);
 
-			$childPid = pcntl_fork();
-			if ($childPid) exit();
+			return $th->pidFileModTime;
+		}
 
-			posix_setsid();
+		public function updatePidFile()
+		{
+			$th = $this->proxyThis();
 
-			if (function_exists('posix_getpid'))
-				$th->pid = posix_getpid();
+			if (empty($th->pidFileModTime))
+				$th->pidFileModTime = $th->getPidFileModTime();
+
+			if (abs(time() - $th->pidFileModTime) >= __CLASS__::PID_FILE_CHECK_INTERVAL_SEC)
+				file_put_contents($th->pidFile, $th->pid);
 		}
 
 		public function listen()
 		{
 			$th = $this->proxyThis();
 
-			$th->initDaemon();
+			$th->acceptNewConnections();
+			$th->readConnectionsBuffers();
+			$th->closeConnections();
 
-			while (true)
-			{
-				if (!empty($th->stop)) return;
-
-				if (mt_rand(1, 1000) == 500)
-					gc_collect_cycles();
-
-				$th->acceptNewConnections();
-				$th->readConnectionsBuffers();
-				$th->closeConnections();
-
-				$th->event('onTick', [$th]);
-
-				usleep(1000);
-			}
-		}
-
-		public function stopDaemon()
-		{
-			$th = $this->proxyThis();
-
-			$th->stop = true;
-
-			unlink($this->pidFile);
-
-			echo PHP_EOL . "SIGTERM" . PHP_EOL;
+			usleep(1000);
 		}
 
 		public function readConnectionsBuffers()
@@ -292,7 +259,7 @@
 				usleep(1000);
 			}
 
-			if (abs(time() - $con->time) > 5)
+			if (abs(time() - $con->time) > 30)
 				$con->dead = true;
 
 			if (is_null($mess)) return false;
