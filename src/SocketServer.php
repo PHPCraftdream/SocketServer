@@ -173,16 +173,38 @@
 
 		public function initDaemon()
 		{
+			$th = $this->proxyThis();
+
 			if (function_exists('pcntl_signal_dispatch'))
 				pcntl_signal_dispatch();
 
 			if (function_exists('pcntl_signal_dispatch'))
-				pcntl_signal(SIGCHLD, array($this, 'stopServer'));
+				pcntl_signal(SIGCHLD, array($th, 'stopServer'));
 
 			if (function_exists('posix_getpid'))
-				$this->pid = posix_getpid();
+				$th->pid = posix_getpid();
+
+			if (file_exists($th->pidFile))
+				throw new Exception("Process already exists: " . @abs(@file_get_contents($th->pidFile)));
+
+			$this->pcntlFork();
 
 			file_put_contents($this->pidFile, $this->pid);
+		}
+
+		public function pcntlFork()
+		{
+			$th = $this->proxyThis();
+
+			if (!function_exists('pcntl_fork')) return;
+
+			$childPid = pcntl_fork();
+			if ($childPid) exit();
+
+			posix_setsid();
+
+			if (function_exists('posix_getpid'))
+				$th->pid = posix_getpid();
 		}
 
 		public function listen()
