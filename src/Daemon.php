@@ -3,6 +3,8 @@
 
 	class Daemon extends \PHPCraftdream\TotalTest\CoreObject
 	{
+		use \PHPCraftdream\Events\traits\Events;
+
 		public $runAsDaemon = true;
 		public $stop = false;
 		public $pid;
@@ -90,7 +92,7 @@
 		{
 			$th = $this->proxyThis();
 
-			$th->collectTrash();
+			$th->collectCycles();
 
 			$th->event('onTick', [$th]);
 		}

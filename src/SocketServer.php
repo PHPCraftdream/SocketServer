@@ -122,16 +122,17 @@
 		{
 			$th = $this->proxyThis();
 
-			$deadIds = [];
+			$ids = [];
+
 			foreach ($this->connections as $id => $con)
 			{
-				if (empty($con->dead)) continue;
-				$deadIds[] = $id;
+				if (empty($con->dead) && empty($con->letsKill)) continue;
+				$ids[] = $id;
 			}
 
-			if (empty($deadIds)) return;
+			if (empty($ids)) return;
 
-			$th->closeConnectionsByIds($deadIds);
+			$th->closeConnectionsByIds($ids);
 		}
 
 		public function getNewConnection($socket)
@@ -160,7 +161,15 @@
 			{
 				socket_set_nonblock($connection);
 
-				$conn = (object)array('resource' => $connection, 'time' => time(), 'mess' => NULL, 'dead' => 0);
+				$conn = (object)
+				[
+					'resource' => $connection,
+					'dCreated' => time(),
+					'time' => time(),
+					'mess' => NULL,
+					'dead' => 0,
+					'letsKill' => 0
+				];
 
 				$th->connections[] = $conn;
 				$newConnections[] = $conn;
