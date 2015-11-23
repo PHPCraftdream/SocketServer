@@ -150,7 +150,7 @@
 
 			$newConnections = [];
 
-			while ($connection = socket_accept($th->socket))
+			while ($connection = @socket_accept($th->socket))
 			{
 				socket_set_nonblock($connection);
 
