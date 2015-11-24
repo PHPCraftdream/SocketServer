@@ -164,10 +164,10 @@
 			if ($status !== self::STATUS_RUN)
 				return;
 
-			$th->daemonStartAlreadyRuning();
+			$th->daemonStartAlreadyRuning($filePid);
 		}
 
-		public function daemonStartAlreadyRuning()
+		public function daemonStartAlreadyRuning($filePid)
 		{
 			$th = $this->proxyThis();
 
