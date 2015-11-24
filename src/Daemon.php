@@ -134,19 +134,25 @@
 
 			list($filePid, $status) = $th->pidStatus();
 
+			if ($status !== self::STATUS_RUN)
+				return;
+
+			echo "Sending SIGTERM signal to $filePid" . PHP_EOL;
+
+			$th->posix_kill__($filePid, SIGTERM);
+			$th->sleep__(3);
+
+			$th->exitIfRunning();
+		}
+
+		public function exitIfRunning()
+		{
+			$th = $this->proxyThis();
+
+			list($filePid, $status) = $th->pidStatus();
+
 			if ($status === self::STATUS_RUN)
-			{
-				echo "Sending SIGTERM signal to $filePid" . PHP_EOL;
-
-				$th->posix_kill__($filePid, SIGTERM);
-
-				$th->sleep__(3);
-
-				list($filePid, $status) = $th->pidStatus();
-
-				if ($status === self::STATUS_RUN)
-					throw new \Exception("Process $filePid still running.");
-			}
+				throw new \Exception("Process $filePid still running.");
 		}
 
 		public function daemonStart()
@@ -155,17 +161,24 @@
 
 			list($filePid, $status) = $th->pidStatus();
 
-			if ($status === self::STATUS_RUN)
-			{
-				$res = $th->posix_kill__($filePid, SIGCONT);
+			if ($status !== self::STATUS_RUN)
+				return;
 
-				echo PHP_EOL . "pid = $filePid, Already running" . PHP_EOL;
+			$th->daemonStartAlreadyRuning();
+		}
 
-				if (!$res)
-					throw new \Exception("Fail on posix_kill($filePid, SIGCONT)");
+		public function daemonStartAlreadyRuning()
+		{
+			$th = $this->proxyThis();
 
-				exit;
-			}
+			$res = $th->posix_kill__($filePid, SIGCONT);
+
+			echo PHP_EOL . "pid = $filePid, Already running" . PHP_EOL;
+
+			if (!$res)
+				throw new \Exception("Fail on posix_kill($filePid, SIGCONT)");
+
+			exit;
 		}
 
 		const STATUS_RUN = 1;
