@@ -18,14 +18,20 @@
 
 		function __construct($pidFile, $args)
 		{
-			$this->pidFile = $pidFile;
-
-			$this->runWithArgs($args);
-
-			$this->init($pidFile);
+			$this->init($pidFile, $args);
 		}
 
 		//--------------------------------------------------------------------------------
+
+		public function init($pidFile, $args)
+		{
+			$th = $this->proxyThis();
+
+			$th->pidFile = $pidFile;
+
+			$th->runWithArgs($args);
+			$th->initDaemon();
+		}
 
 		public function runWithArgs($args)
 		{
@@ -150,7 +156,16 @@
 			list($filePid, $status) = $th->pidStatus();
 
 			if ($status === self::STATUS_RUN)
-				throw new \Exception("Daemon is already running");
+			{
+				$res = $th->posix_kill__($filePid, SIGCONT);
+
+				echo PHP_EOL . "pid = $filePid, Already running" . PHP_EOL;
+
+				if (!$res)
+					throw new \Exception("Fail on posix_kill($filePid, SIGCONT)");
+
+				exit;
+			}
 		}
 
 		const STATUS_RUN = 1;
@@ -186,19 +201,10 @@
 
 		//--------------------------------------------------------------------------------
 
-		public function init()
-		{
-			$th = $this->proxyThis();
-
-			$th->gc_disable__();
-
-			$th->initDaemon();
-		}
-
-
 		public function initDaemon()
 		{
 			$th = $this->proxyThis();
+			$th->gc_disable__();
 
 			declare(ticks=1);
 			$th->pcntl_signal_dispatch__();
