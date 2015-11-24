@@ -11,6 +11,7 @@
 		public $pidFile;
 		public $pidFileModTime;
 		public $lastCollectCyclesTime = 0;
+		public $lastUpdatePidFileTime = 0;
 
 		const CYCLES_CHECK_INTERVAL_SEC = 30;
 		const PID_FILE_CHECK_INTERVAL_SEC = 30;
@@ -36,30 +37,30 @@
 			$th = $this->proxyThis();
 
 			declare(ticks=1);
-			pcntl_signal_dispatch();
-			pcntl_signal(SIGTERM, [$th, 'stopDaemon']);
+			$th->pcntl_signal_dispatch__();
+			$th->pcntl_signal__(SIGTERM, [$th, 'stopDaemon']);
 
-			$th->pid = posix_getpid();
+			$th->pid = $th->posix_getpid__();
 
 			if (file_exists($th->pidFile))
-				throw new \Exception("Process already exists: " . @abs(@file_get_contents($th->pidFile)));
+				throw new \Exception("Process already exists: " . @abs(@$th->file_get_contents__($th->pidFile)));
 
 			if ($th->runAsDaemon)
 				$th->pcntlFork();
 
-			file_put_contents($th->pidFile, $th->pid);
+			$th->file_put_contents__($th->pidFile, $th->pid);
 		}
 
 		public function pcntlFork()
 		{
 			$th = $this->proxyThis();
 
-			$childPid = pcntl_fork();
+			$childPid = $th->pcntl_fork__();
 			if ($childPid) exit();
 
-			posix_setsid();
+			$th->posix_setsid__();
 
-			$th->pid = posix_getpid();
+			$th->pid = $th->posix_getpid__();
 		}
 
 		public function stopDaemon()
@@ -71,7 +72,7 @@
 			echo $str;
 
 			$th->stop = true;
-			unlink($th->pidFile);
+			$th->unlink__($th->pidFile);
 		}
 
 		public function collectCycles()
@@ -83,9 +84,39 @@
 			if ($last < self::CYCLES_CHECK_INTERVAL_SEC)
 				return;
 
-			gc_collect_cycles();
+			$th->gc_collect_cycles__();
 
-			$th->lastCollectCyclesTime = time();
+			$th->lastCollectCyclesTime = $th->time__();
+		}
+
+		public function pidFileIsMyhek()
+		{
+			$th = $this->proxyThis();
+
+			if (!$th->file_exists__($th->pidFile))
+				return true;
+
+			$pidFromFile = @abs(@$th->file_put_contents__($th->pidFile));
+			$res = $pidFromFile === $th->pid;
+
+			return $res;
+		}
+
+		public function updatePidFile()
+		{
+			$th = $this->proxyThis();
+
+			$last = abs(time() - $th->lastUpdatePidFileTime);
+
+			if ($last < self::PID_FILE_CHECK_INTERVAL_SEC)
+				return;
+
+			if (!$th->pidFileIsMyhek())
+				throw new \Exception("Wrong pid: $pidFromFile != {$th->pid}");
+
+			$th->file_put_contents__($th->pidFile, $th->pid);
+
+			$th->lastUpdatePidFileTime = time();
 		}
 
 		public function tick()
@@ -93,6 +124,7 @@
 			$th = $this->proxyThis();
 
 			$th->collectCycles();
+			$th->updatePidFile();
 
 			$th->event('onTick', [$th]);
 		}
