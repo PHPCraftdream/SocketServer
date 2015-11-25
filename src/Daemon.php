@@ -268,7 +268,7 @@
 			$th->lastCollectCyclesTime = $th->time__();
 		}
 
-		public function pidFileIsMyhek()
+		public function pidFileIsMy()
 		{
 			$th = $this->proxyThis();
 
@@ -290,7 +290,7 @@
 			if ($last < self::PID_FILE_CHECK_INTERVAL_SEC)
 				return;
 
-			if (!$th->pidFileIsMyhek())
+			if (!$th->pidFileIsMy())
 				throw new \Exception("Wrong pid.");
 
 			$th->file_put_contents__($th->pidFile, $th->pid);
