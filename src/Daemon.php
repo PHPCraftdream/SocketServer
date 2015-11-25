@@ -30,7 +30,6 @@
 			$th->pidFile = $pidFile;
 
 			$th->runWithArgs($args);
-			$th->initDaemon();
 		}
 
 		public function runWithArgs($args)
@@ -312,6 +311,8 @@
 		public function run()
 		{
 			$th = $this->proxyThis();
+
+			$th->initDaemon();
 
 			while (true)
 			{
