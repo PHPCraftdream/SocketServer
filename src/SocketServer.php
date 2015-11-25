@@ -210,7 +210,9 @@
 
 				if (empty($hasMess)) continue;
 
-				$th->event('onMessageSystem', [$th, $con]);
+				$continue = $th->event('onMessageSystem', [$th, $con]);
+				if ($continue === false) continue;
+
 				$th->event('onMessage', [$th, $con]);
 			}
 		}
