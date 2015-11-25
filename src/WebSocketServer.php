@@ -40,16 +40,18 @@
 
 			if (strtolower($con->mess) === 'ping')
 			{
+				$con->mess = '';
 				$th->___parentCall('sendMessage', [$con->resource, 'PONG']);
-				return;
+				return false;
 			}
 
 			$con->mess = $th->dataDecode($con->mess);
 
 			if (strtolower($con->mess) === 'ping')
 			{
+				$con->mess = '';
 				$th->wsMessage($con->resource, 'PONG');
-				return;
+				return false;
 			}
 		}
 
