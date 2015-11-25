@@ -41,6 +41,7 @@
 			if (strtolower($con->mess) === 'ping')
 			{
 				$con->mess = '';
+				$th->event('onPing', [$ws, $con]);
 				$th->___parentCall('sendMessage', [$con->resource, 'PONG']);
 				return false;
 			}
@@ -50,6 +51,7 @@
 			if (strtolower($con->mess) === 'ping')
 			{
 				$con->mess = '';
+				$th->event('onPing', [$ws, $con]);
 				$th->wsMessage($con->resource, 'PONG');
 				return false;
 			}
