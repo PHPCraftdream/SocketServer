@@ -40,7 +40,7 @@
 
 			//---------------------------------------------------------------
 
-			$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+			$socket = $th->socket_create__(AF_INET, SOCK_STREAM, SOL_TCP);
 			if (!$socket)
 				return $th->throwLastSocketError();
 			//---------------------------------------------------------------
@@ -162,7 +162,7 @@
 			}
 			catch (\PHPCraftdream\ErrorLog\UnhandledError $e)
 			{
-				return $th->throwLastSocketError();
+				$conn = NULL;
 			}
 
 			return $conn;
