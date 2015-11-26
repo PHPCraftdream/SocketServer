@@ -180,6 +180,7 @@
 
 				$conn = (object)
 				[
+					'id' => time() . uniqid(),
 					'resource' => $connection,
 					'dCreated' => time(),
 					'time' => time(),
