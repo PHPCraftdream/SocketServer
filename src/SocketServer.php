@@ -13,7 +13,7 @@
 
 		function __construct($addr = '127.0.0.1', $port = 35471)
 		{
-			$this->initServ($addr, $port);
+			$this->setServ($addr, $port);
 		}
 
 		public function getLastSocketError()
@@ -26,14 +26,17 @@
 			return $error;
 		}
 
-		public function initServ($addr, $port)
+		public function setServ($addr, $port)
 		{
 			$th = $this->proxyThis();
 
-			$th->gc_disable__();
-
 			$th->addr = $addr;
 			$th->port = $port;
+		}
+
+		public function initServ()
+		{
+			$th = $this->proxyThis();
 
 			//---------------------------------------------------------------
 
@@ -63,6 +66,18 @@
 			//---------------------------------------------------------------
 
 			$th->socket = $socket;
+		}
+
+		public function restartListeningSocket()
+		{
+			$th = $this->proxyThis();
+
+			if ($th->socket)
+				$th->closeSocket($th->socket);
+
+			sleep(1);
+
+			$th->initServ($th->addr, $th->port);
 		}
 
 		public function throwLastSocketError()

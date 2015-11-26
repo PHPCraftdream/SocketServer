@@ -241,8 +241,9 @@
 			if ($childPid) exit();
 
 			$th->posix_setsid__();
-
 			$th->pid = $th->posix_getpid__();
+
+			$th->event('onFork', [$th]);
 		}
 
 		public function stopDaemon()
@@ -316,6 +317,8 @@
 			$th = $this->proxyThis();
 
 			$th->initDaemon();
+
+			$th->event('onRun', [$th]);
 
 			while (true)
 			{
