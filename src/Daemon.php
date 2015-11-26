@@ -194,23 +194,14 @@
 			$filePid = $th->getFilePid();
 
 			if (empty($filePid))
-				return [$filePid, self::STATUS_STOPPED];
+				return [0, self::STATUS_STOPPED];
 
 			if ($th->posix_kill__($filePid, SIGCONT))
 				return [$filePid, self::STATUS_RUN];
 
-			$pidFileMTime = 0;
+			$th->unlink__($th->pidFile);
 
-			if ($th->is_file__($th->pidFile))
-				$pidFileMTime = $th->filemtime__($th->pidFile);
-
-			if (abs(time() - $pidFileMTime) > self::PID_FILE_CHECK_INTERVAL_SEC + 60)
-			{
-				$th->unlink__($th->pidFile);
-				return [0, self::STATUS_STOPPED];
-			}
-
-			return [$filePid, self::STATUS_RUN];
+			return [0, self::STATUS_STOPPED];
 		}
 
 		public function getFilePid()
