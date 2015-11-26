@@ -214,6 +214,9 @@
 		{
 			$th = $this->proxyThis();
 
+			if (!$th->file_exists__($th->pidFile))
+				return 0;
+
 			return @abs(@$th->file_get_contents__($th->pidFile));
 		}
 

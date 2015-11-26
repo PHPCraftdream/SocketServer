@@ -137,6 +137,8 @@
 
 		public function getNewConnection($socket)
 		{
+			$th = $this->proxyThis();
+
 			$conn = NULL;
 
 			try
