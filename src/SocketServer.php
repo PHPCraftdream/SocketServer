@@ -77,7 +77,7 @@
 
 			sleep(1);
 
-			$th->initServ($th->addr, $th->port);
+			$th->initServ();
 		}
 
 		public function throwLastSocketError()
