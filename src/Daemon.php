@@ -202,7 +202,10 @@
 				$pidFileMTime = $th->filemtime__($th->pidFile);
 
 			if (abs(time() - $pidFileMTime) > self::PID_FILE_CHECK_INTERVAL_SEC + 30)
-				return [$filePid, self::STATUS_STOPPED];
+			{
+				$th->unlink__($th->pidFile);
+				return [0, self::STATUS_STOPPED];
+			}
 
 			return [$filePid, self::STATUS_RUN];
 		}
