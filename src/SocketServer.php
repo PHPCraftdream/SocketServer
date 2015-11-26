@@ -91,8 +91,15 @@
 		{
 			$th = $this->proxyThis();
 
-			$th->socket_shutdown__($conRes, 2);
-			$th->socket_close__($conRes);
+			try
+			{
+				$th->socket_shutdown__($conRes, 2);
+				$th->socket_close__($conRes);
+			}
+			catch (\PHPCraftdream\ErrorLog\UnhandledError $e)
+			{
+
+			}
 		}
 
 		public function reindexConnections()
