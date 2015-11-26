@@ -172,10 +172,13 @@
 
 			$res = $th->posix_kill__($filePid, SIGCONT);
 
-			echo PHP_EOL . "pid = $filePid, Already running" . PHP_EOL;
-
 			if (!$res)
-				throw new \Exception("Fail on posix_kill($filePid, SIGCONT)");
+			{
+				$th->file_put_contents__($th->pidFile, $th->posix_getpid__());
+				return;
+			}
+
+			echo PHP_EOL . "pid = $filePid, Already running" . PHP_EOL;
 
 			exit;
 		}
