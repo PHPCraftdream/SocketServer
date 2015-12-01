@@ -103,7 +103,7 @@
 
 			$th->daemonReStart();
 
-			echo PHP_EOL . "stoped" . PHP_EOL;
+			echo PHP_EOL . "stopped" . PHP_EOL;
 			exit;
 		}
 
