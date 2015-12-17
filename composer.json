@@ -3,7 +3,14 @@
 	"license": "MIT",
 	"type": "library",
 	"minimum-stability": "dev",
-	"version": "1.0.0",
+	"version": "1.0.0-dev",
+	"extra":
+	{
+		"branch-alias":
+		{
+			"dev-master": "1.0.x-dev"
+		}
+	},
 	"autoload":
 	{
 		"psr-4":
